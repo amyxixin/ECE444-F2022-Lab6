@@ -20,6 +20,15 @@ def client():
     db.drop_all()  # teardown
 
 
+def search(client, query):
+    """Search helper function"""
+    return client.post(
+        "/search",
+        query=query,
+        follow_redirects=True,
+    )
+
+
 def login(client, username, password):
     """Login helper function"""
     return client.post(
@@ -80,3 +89,10 @@ def test_delete_message(client):
     rv = client.get('/delete/1')
     data = json.loads(rv.data)
     assert data["status"] == 1
+
+def test_search(client):
+    """Ensure search returns results"""
+    test_messages(client)
+    query = "Hello"
+    rv = client.get('/search/?query=' + query)
+    assert b"Hello" in rv.data
